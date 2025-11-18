@@ -12,7 +12,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,8 +30,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
-import { authClient } from "@/lib/auth-cliente";
+import { authClient } from "@/lib/auth-client";
 
 // Menu items.
 const items = [
@@ -64,6 +65,8 @@ const items = [
 
 export function AppSidebar() {
   const router = useRouter();
+  const session = authClient.useSession();
+  const { state } = useSidebar();
   const handleSignOut = async () => {
     await authClient.signOut({
       fetchOptions: {
@@ -74,9 +77,18 @@ export function AppSidebar() {
     });
   };
   return (
-    <Sidebar>
+    <Sidebar collapsible="icon">
       <SidebarHeader className="border-b p-4">
-        <Image src="/logo.svg" alt="Doutor Agenda" width={100} height={100} />
+        {state === "collapsed" ? (
+          <Image
+            src="/logomarca.svg"
+            alt="Doutor Agenda"
+            width={15}
+            height={15}
+          />
+        ) : (
+          <Image src="/logo.svg" alt="Doutor Agenda" width={100} height={100} />
+        )}
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
@@ -103,7 +115,24 @@ export function AppSidebar() {
             <SidebarMenuButton asChild>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button>Clínica</Button>
+                  <SidebarMenuButton size="lg">
+                    <Avatar>
+                      <AvatarImage
+                        src={session?.data?.user?.image || undefined}
+                      />
+                      <AvatarFallback className="bg-primary text-primary-foreground">
+                        {session?.data?.user?.name?.charAt(0)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="text-sm font-medium">
+                        {session.data?.user?.clinic?.name}
+                      </p>
+                      <p className="text-muted-foreground text-xs">
+                        {session?.data?.user?.email}
+                      </p>
+                    </div>
+                  </SidebarMenuButton>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                   <DropdownMenuItem onClick={handleSignOut}>
