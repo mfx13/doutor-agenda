@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 
 import { db } from "@/db";
@@ -19,4 +20,7 @@ export const createClinic = async (name: string) => {
     userId: session.user.id,
     clinicId: clinic.id,
   });
+  // Revalida o dashboard e o layout protegido para atualizar a sessão
+  revalidatePath("/dashboard");
+  revalidatePath("/(protected)");
 };

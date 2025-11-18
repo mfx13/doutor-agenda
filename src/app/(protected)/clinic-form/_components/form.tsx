@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
@@ -28,7 +27,6 @@ const clinicFormSchema = z.object({
 });
 
 const ClinicForm = () => {
-  const router = useRouter();
   const form = useForm<z.infer<typeof clinicFormSchema>>({
     resolver: zodResolver(clinicFormSchema),
     defaultValues: {
@@ -41,7 +39,8 @@ const ClinicForm = () => {
       await createClinic(data.name);
       form.reset();
       toast.success("Clínica criada com sucesso");
-      router.push("/dashboard");
+      // Força um reload completo para garantir que a sessão seja atualizada
+      window.location.href = "/dashboard";
     } catch (error) {
       console.error(error);
       toast.error("Erro ao criar clínica");
